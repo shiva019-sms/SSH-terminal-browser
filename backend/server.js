@@ -1,8 +1,28 @@
+const express = require('express');
+const WebSocket = require('ws');
+const { Client } = require('ssh2');
+const cors = require('cors');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors()); // Allow CORS
+
+// Start Express server
+const server = app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
+// Create WebSocket server
+const wss = new WebSocket.Server({ server });
+
 wss.on('connection', (ws) => {
+    console.log('New WebSocket connection');
+
     ws.on('message', (message) => {
         let credentials;
         try {
-            credentials = JSON.parse(message);
+            credentials = JSON.parse(message); // Expecting JSON input
         } catch (error) {
             ws.send('Error: Invalid authentication format\r\n');
             ws.close();
@@ -10,7 +30,6 @@ wss.on('connection', (ws) => {
         }
 
         const { username, password, host, port } = credentials;
-
         if (!username || !password || !host) {
             ws.send('Error: Missing required fields\r\n');
             ws.close();
@@ -18,7 +37,6 @@ wss.on('connection', (ws) => {
         }
 
         const conn = new Client();
-
         conn.on('ready', () => {
             ws.send('SSH Connection Established\r\n');
 
@@ -37,6 +55,7 @@ wss.on('connection', (ws) => {
                 });
 
                 stream.on('close', () => {
+                    ws.send('SSH session closed.\r\n');
                     ws.close();
                     conn.end();
                 });
@@ -50,7 +69,7 @@ wss.on('connection', (ws) => {
 
         conn.connect({
             host: host,
-            port: port,
+            port: port || 22,
             username: username,
             password: password,
         });
@@ -59,4 +78,8 @@ wss.on('connection', (ws) => {
             conn.end();
         });
     });
+});
+
+app.get('/', (req, res) => {
+    res.send('WebSocket SSH Server is running.');
 });
