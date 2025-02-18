@@ -17,26 +17,28 @@ async function connectSSH() {
 
     term.clear();
 
-    const socket = new WebSocket(`ws://localhost:3000/ssh?username=${username}&password=${password}&host=${host}&port=${port}`);
+    const socket = new WebSocket(`wss://cosmic-gingersnap-4a2c9b.netlify.app`);
 
     socket.onopen = () => {
-        term.write('Connecting to SSH...\r\n');
-        socket.send(password + '\r\n');
-
-        term.onData((data) => {
-            socket.send(data);
-        });
-
-        socket.onmessage = (event) => {
-            term.write(event.data);
-        };
+        term.write('Connected to WebSocket server...\r\n');
+        const authData = JSON.stringify({ username, password, host, port });
+        socket.send(authData); // Send JSON object instead of just password
     };
 
-    socket.onerror = (error) => {
-        term.write(`Error: ${error.message}\r\n`);
+    socket.onmessage = (event) => {
+        term.write(event.data);
+    };
+
+    socket.onerror = (event) => {
+        console.error("WebSocket Error:", event);
+        term.write("WebSocket error occurred. Check console for details.\r\n");
     };
 
     socket.onclose = () => {
         term.write('SSH connection closed.\r\n');
     };
+
+    term.onData((data) => {
+        socket.send(data);
+    });
 }
