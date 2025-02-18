@@ -17,7 +17,7 @@ async function connectSSH() {
 
     term.clear();
 
-    const socket = new WebSocket(`wss://cosmic-gingersnap-4a2c9b.netlify.app`);
+    const socket = new WebSocket(`https://terminal-server-52fy.onrender.com/`);
 
     socket.onopen = () => {
         term.write('Connected to WebSocket server...\r\n');
