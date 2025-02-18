@@ -17,7 +17,7 @@ async function connectSSH() {
 
     term.clear();
 
-    const socket = new WebSocket(`wss://ssh-terminal-browser.onrender.com/ssh?username=${username}&password=${password}&host=${host}&port=${port}`);
+    const socket = new WebSocket(`wss://ssh-terminal-browser.onrender.com`);
 
 
     socket.onopen = () => {
