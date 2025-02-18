@@ -1,0 +1,15 @@
+{
+  "name": "ssh-web-terminal-backend",
+  "version": "1.0.0",
+  "description": "Backend for web-based SSH terminal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "ssh2": "^1.11.0",
+    "ws": "^8.13.0"
+  }
+}
